@@ -23,10 +23,12 @@ android {
         }
     }
 
-    android {
-        lintOptions {
-            disable 'TypographyFractions','TypographyQuotes', 'ObsoleteLintCustomCheck'
-        }
+    lintOptions {
+        disable 'TypographyFractions', 'TypographyQuotes', 'ObsoleteLintCustomCheck'
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
     }
 }
 

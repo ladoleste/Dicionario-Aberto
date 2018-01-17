@@ -9,7 +9,7 @@ data class Entry(
         @SerializedName("form")
         var form: Form? = null,
         @SerializedName("sense")
-        var sense: List<Sense>? = null,
+        val sense: List<Sense>,
         @SerializedName("etym")
         var etym: Etym? = null
 )

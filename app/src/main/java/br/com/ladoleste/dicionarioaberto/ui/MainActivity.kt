@@ -10,7 +10,9 @@ import br.com.ladoleste.dicionarioaberto.app.Api
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
+import retrofit2.HttpException
 import timber.log.Timber
+import java.net.SocketTimeoutException
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,14 +32,17 @@ class MainActivity : AppCompatActivity() {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({ x ->
                         pb_loading.visibility = View.GONE
-                        x.entry?.let {
-                            rlDefinicoes.adapter = AdapterDefinicoes(it.sense)
+                        rlDefinicoes.adapter = AdapterDefinicoes(x.superEntry[0].entry.sense)
                             pb_loading.visibility = View.GONE
-                        }
 
                     }, { x ->
                         pb_loading.visibility = View.GONE
-                        Toast.makeText(this, x.message, Toast.LENGTH_SHORT).show()
+
+                        when (x) {
+                            is HttpException -> Toast.makeText(this, "Entrada não encontrada", Toast.LENGTH_SHORT).show()
+                            is SocketTimeoutException -> Toast.makeText(this, "Servidor ocupado, tente novamente em instantes", Toast.LENGTH_LONG).show()
+                            else -> Toast.makeText(this, x.message, Toast.LENGTH_SHORT).show()
+                        }
                         Timber.e(x)
                     })
         }

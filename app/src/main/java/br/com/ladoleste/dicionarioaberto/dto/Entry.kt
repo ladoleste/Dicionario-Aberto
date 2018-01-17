@@ -8,8 +8,15 @@ data class Entry(
         var id: String? = null,
         @SerializedName("form")
         var form: Form? = null,
-        @SerializedName("sense")
-        val sense: List<Sense>,
         @SerializedName("etym")
-        var etym: Etym? = null
+        var etym: Etym? = null,
+        @SerializedName("@n")
+        var n: String? = null,
+        @SerializedName("@type")
+        var type: String? = null,
+        @SerializedName("@ast")
+        var ast: String? = null,
+        @SerializedName("sense")
+        val sense: List<Sense>
+
 )

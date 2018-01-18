@@ -21,12 +21,13 @@ class AdapterDefinicoes(private val definicoes: List<SuperEntry>) : RecyclerView
 
         var x = ""
         senses.forEachIndexed({ i, s ->
-            x += String.format("<p>%s. %s <p/>", (i + 1), s.def)
+            x += String.format("%s. %s<br/><br/>", (i + 1), s.def)
         })
 
         x = x
-                .replace("_.+?_".toRegex(), "<i>$0<</i>")
+                .replace("_.+?_".toRegex(), "<i>$0</i>")
                 .replace("_", "")
+                .dropLast(10)
 
         holder.itemView.tv_def.text = x.toHtml()
     }

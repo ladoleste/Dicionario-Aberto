@@ -26,27 +26,37 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         bt_definir.setOnClickListener {
-            pb_loading.visibility = View.VISIBLE
-            Api.criar().obterDefinicao(et_entrada.text.toString())
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({ x ->
-                        pb_loading.visibility = View.GONE
-                        rlDefinicoes.adapter = AdapterDefinicoes(x.superEntry[0].entry.sense)
+
+            if (et_entrada.text.isNotBlank()) {
+
+                pb_loading.visibility = View.VISIBLE
+                Api.criar().obterDefinicao(et_entrada.text.toString())
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({ x ->
+                            pb_loading.visibility = View.GONE
+                            rlDefinicoes.adapter = AdapterDefinicoes(x.superEntry)
                             pb_loading.visibility = View.GONE
 
-                    }, { x ->
-                        pb_loading.visibility = View.GONE
+                        }, { x ->
+                            pb_loading.visibility = View.GONE
 
-                        when (x) {
-                            is HttpException -> Toast.makeText(this, "Entrada não encontrada", Toast.LENGTH_SHORT).show()
-                            is SocketTimeoutException -> Toast.makeText(this, "Servidor ocupado, tente novamente em instantes", Toast.LENGTH_LONG).show()
-                            else -> Toast.makeText(this, x.message, Toast.LENGTH_SHORT).show()
-                        }
-                        Timber.e(x)
-                    })
+                            when (x) {
+                                is HttpException -> Toast.makeText(this, "Entrada não encontrada", Toast.LENGTH_SHORT).show()
+                                is SocketTimeoutException -> Toast.makeText(this, "Servidor ocupado, tente novamente em instantes", Toast.LENGTH_LONG).show()
+                                else -> Toast.makeText(this, x.message, Toast.LENGTH_SHORT).show()
+                            }
+                            Timber.e(x)
+                        })
+            } else {
+                et_entrada.error = "Informe uma palavra"
+            }
         }
 
+        bt_limpar.setOnClickListener {
+            et_entrada.setText("")
+            rlDefinicoes.adapter = AdapterDefinicoes(emptyList())
+        }
 
     }
 }

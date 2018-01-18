@@ -1,7 +1,7 @@
 package br.com.ladoleste.dicionarioaberto.app
 
 import br.com.ladoleste.dicionarioaberto.BuildConfig
-import br.com.ladoleste.dicionarioaberto.dto.SuperExample
+import br.com.ladoleste.dicionarioaberto.dto.Definicoes
 import com.google.gson.GsonBuilder
 import io.reactivex.Observable
 import retrofit2.Retrofit
@@ -15,12 +15,12 @@ import retrofit2.http.Path
  */
 interface Api {
     @GET("search-json/{palavra}")
-    fun obterDefinicao(@Path("palavra") palavra: String): Observable<SuperExample>
+    fun obterDefinicao(@Path("palavra") palavra: String): Observable<Definicoes>
 
     companion object {
         fun criar(): Api {
 
-            val gson = GsonBuilder().registerTypeAdapter(SuperExample::class.java, CustomDeserializer()).create()
+            val gson = GsonBuilder().registerTypeAdapter(Definicoes::class.java, CustomDeserializer()).create()
 
             val retrofit = Retrofit.Builder()
                     .client(OkHttpProvider.okHttpInstance)

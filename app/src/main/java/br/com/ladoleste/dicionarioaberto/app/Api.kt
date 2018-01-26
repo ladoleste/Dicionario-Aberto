@@ -1,6 +1,7 @@
 package br.com.ladoleste.dicionarioaberto.app
 
 import br.com.ladoleste.dicionarioaberto.BuildConfig
+import br.com.ladoleste.dicionarioaberto.dto.Busca
 import br.com.ladoleste.dicionarioaberto.dto.Definicoes
 import com.google.gson.GsonBuilder
 import io.reactivex.Observable
@@ -9,6 +10,7 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 /**
  *Created by Anderson on 08/12/2017.
@@ -16,6 +18,9 @@ import retrofit2.http.Path
 interface Api {
     @GET("search-json/{palavra}")
     fun obterDefinicao(@Path("palavra") palavra: String): Observable<Definicoes>
+
+    @GET("search-json")
+    fun buscarPalavra(@Query("prefix") palavra: String): Observable<Busca>
 
     companion object {
         fun criar(): Api {

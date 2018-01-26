@@ -1,5 +1,6 @@
 package br.com.ladoleste.dicionarioaberto.ui
 
+import android.annotation.SuppressLint
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +16,7 @@ class AdapterDefinicoes(private val definicoes: List<SuperEntry>) : RecyclerView
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ViewHolder(parent.inflate(R.layout.item_definicao))
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
 
         val senses = definicoes[position].entry.sense
@@ -30,6 +32,16 @@ class AdapterDefinicoes(private val definicoes: List<SuperEntry>) : RecyclerView
                 .dropLast(10)
 
         holder.itemView.tv_def.text = x.toHtml()
+        holder.itemView.tv_title.text = definicoes[position].entry.form?.orth + temp(position)
+    }
+
+    private fun temp(position: Int): String {
+        return when (position) {
+            0 -> "¹"
+            1 -> "²"
+            2 -> "³"
+            else -> " ($position)"
+        }
     }
 
     class ViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView)

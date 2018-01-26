@@ -34,7 +34,6 @@ class MainActivity : BaseActivity() {
         rl_definicoes
     }
 
-    val lista = mutableListOf<String>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -42,7 +41,7 @@ class MainActivity : BaseActivity() {
 
         //room()
 
-        val adapter = ArrayAdapter<String>(this, android.R.layout.select_dialog_item, lista)
+        val adapter = ArrayAdapter<String>(this, android.R.layout.select_dialog_item, emptyList())
 
         et_entrada.threshold = 1
         et_entrada.setAdapter(adapter)
@@ -56,10 +55,8 @@ class MainActivity : BaseActivity() {
                 cDispose.add(viewModel.buscarPalavra(s.toString())
                         .debounce(1, TimeUnit.SECONDS)
                         .subscribe({
-                            lista.clear()
-                            lista.addAll(it.list)
                             adapter.clear()
-                            adapter.addAll(lista)
+                            adapter.addAll(it.list)
                             adapter.filter.filter(et_entrada.text, et_entrada)
                         },
                                 { t -> Timber.e(t) })

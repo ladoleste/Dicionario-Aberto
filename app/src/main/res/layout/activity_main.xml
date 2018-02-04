@@ -35,11 +35,13 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:hint="Informe a palavra"
+        android:maxLines="1"
         app:layout_constraintEnd_toEndOf="@id/guide_end"
         app:layout_constraintStart_toStartOf="@id/guide_start"
         app:layout_constraintTop_toTopOf="parent">
 
         <AutoCompleteTextView
+            android:maxLines="1"
             android:id="@+id/et_entrada"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

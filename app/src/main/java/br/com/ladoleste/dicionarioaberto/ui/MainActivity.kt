@@ -39,8 +39,6 @@ class MainActivity : BaseActivity() {
         setContentView(R.layout.activity_main)
         viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
 
-        //room()
-
         val adapter = ArrayAdapter<String>(this, android.R.layout.select_dialog_item, emptyList())
 
         et_entrada.threshold = 1
@@ -49,6 +47,8 @@ class MainActivity : BaseActivity() {
         et_entrada.onItemClickListener = AdapterView.OnItemClickListener { _, _, _, _ ->
             bt_definir.performClick()
         }
+
+        val context = this;
 
         et_entrada.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
@@ -59,7 +59,18 @@ class MainActivity : BaseActivity() {
                             adapter.addAll(it.list)
                             adapter.filter.filter(et_entrada.text, et_entrada)
                         },
-                                { t -> Timber.e(t) })
+                                { t ->
+
+                                    when (t) {
+                                        is HttpException -> Toast.makeText(context, "Entrada não encontrada", Toast.LENGTH_SHORT).show()
+                                        is SocketTimeoutException -> Toast.makeText(context, "Servidor ocupado, tente novamente em instantes", Toast.LENGTH_LONG).show()
+                                        else -> Toast.makeText(context, t.message, Toast.LENGTH_SHORT).show()
+                                    }
+
+                                    Timber.e(t)
+
+
+                                })
                 )
             }
 
@@ -91,15 +102,15 @@ class MainActivity : BaseActivity() {
                     val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                     imm.hideSoftInputFromWindow(et_entrada.windowToken, 0)
 
-                }, { x ->
+                }, { t ->
                     pb_loading.visibility = View.GONE
 
-                    when (x) {
+                    when (t) {
                         is HttpException -> Toast.makeText(this, "Entrada não encontrada", Toast.LENGTH_SHORT).show()
                         is SocketTimeoutException -> Toast.makeText(this, "Servidor ocupado, tente novamente em instantes", Toast.LENGTH_LONG).show()
-                        else -> Toast.makeText(this, x.message, Toast.LENGTH_SHORT).show()
+                        else -> Toast.makeText(this, t.message, Toast.LENGTH_SHORT).show()
                     }
-                    Timber.e(x)
+                    Timber.e(t)
                 }))
 
             } else {
@@ -111,6 +122,8 @@ class MainActivity : BaseActivity() {
             et_entrada.setText("")
             rlDefinicoes.adapter = AdapterDefinicoes(emptyList())
         }
+
+        //room()
 
     }
 

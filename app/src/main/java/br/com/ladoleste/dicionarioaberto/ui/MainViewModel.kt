@@ -5,23 +5,34 @@ import br.com.ladoleste.dicionarioaberto.app.Api
 import br.com.ladoleste.dicionarioaberto.dto.Busca
 import br.com.ladoleste.dicionarioaberto.dto.Definicoes
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 /**
  *Created by Anderson on 10/12/2017.
  */
 class MainViewModel : ViewModel() {
 
-    fun obterDefinicao(palavra: String): Observable<Definicoes> {
-        return Api.criar().obterDefinicao(palavra)
-                .subscribeOn(Schedulers.newThread())
+    private val api = Api.criar()
+
+    fun obterDefinicao(palavra: String): Single<Definicoes> {
+
+        return api.obterDefinicao(palavra)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnError({ t -> Timber.e(t) })
     }
 
-    fun buscarPalavra(termo: String): Observable<Busca> {
-        return Api.criar().buscarPalavra(termo)
-                .subscribeOn(Schedulers.newThread())
+    fun completarPalavra(termo: String): Observable<Busca> {
+
+        return api.completarPalavra(termo)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .map({ x -> Busca(x.list.distinct()) })
+                .debounce(1, TimeUnit.SECONDS)
+                .doOnError({ t -> Timber.e(t) })
     }
 }

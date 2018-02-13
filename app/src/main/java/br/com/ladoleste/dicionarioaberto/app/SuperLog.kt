@@ -12,7 +12,14 @@ class SuperLog : Timber.DebugTree() {
     }
 
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-        //todo automatic conversion from Java, needs to be rewritten
-        Log.println(priority, "MyApp", String.format(".(%s.kt:%s) - %s", tag!!.split("\\|".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0], tag.split("\\|".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[1], message))
+
+        tag?.let {
+            if (it.contains('|')) {
+                Log.println(priority, "MyApp", String.format(".(%s.kt:%s) - %s", tag!!.split("\\|".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0], tag.split("\\|".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[1], message))
+            } else {
+                Log.println(priority, tag, message)
+            }
+        } ?: Log.println(priority, "MyApp", message)
+
     }
 }

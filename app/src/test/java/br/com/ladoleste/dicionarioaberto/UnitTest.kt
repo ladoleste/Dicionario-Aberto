@@ -11,6 +11,14 @@ import org.junit.Test
 class UnitTest {
     @Test
     fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
+
+        val a = sum(5)
+        val b = a(15)
+        val c = b(0)
+
+        assertEquals(20, c)
     }
+
+    private fun sum(a: Int) = { b: Int -> { c: Int -> a + b + c } }
+
 }

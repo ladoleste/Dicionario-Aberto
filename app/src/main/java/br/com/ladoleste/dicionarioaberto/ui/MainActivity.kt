@@ -1,10 +1,10 @@
 package br.com.ladoleste.dicionarioaberto.ui
 
 import android.arch.lifecycle.ViewModelProviders
-import android.arch.persistence.room.Room
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
 import android.text.TextWatcher
@@ -13,13 +13,10 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Toast
 import br.com.ladoleste.dicionarioaberto.R
-import br.com.ladoleste.dicionarioaberto.app.AppDatabase
-import br.com.ladoleste.dicionarioaberto.dto.Teste
+import br.com.ladoleste.dicionarioaberto.dto.Definicoes
 import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.HttpException
-import timber.log.Timber
 import java.net.SocketTimeoutException
 import java.util.concurrent.TimeUnit
 
@@ -36,6 +33,7 @@ class MainActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_main)
         viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
 
@@ -48,29 +46,22 @@ class MainActivity : BaseActivity() {
             bt_definir.performClick()
         }
 
-        val context = this;
-
         et_entrada.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                cDispose.add(viewModel.buscarPalavra(s.toString())
+
+                if (s.isNullOrBlank())
+                    return
+
+                cDispose.add(viewModel.completarPalavra(s.toString())
                         .debounce(1, TimeUnit.SECONDS)
                         .subscribe({
                             adapter.clear()
                             adapter.addAll(it.list)
                             adapter.filter.filter(et_entrada.text, et_entrada)
-                        },
-                                { t ->
-
-                                    when (t) {
-                                        is HttpException -> Toast.makeText(context, "Entrada não encontrada", Toast.LENGTH_SHORT).show()
-                                        is SocketTimeoutException -> Toast.makeText(context, "Servidor ocupado, tente novamente em instantes", Toast.LENGTH_LONG).show()
-                                        else -> Toast.makeText(context, t.message, Toast.LENGTH_SHORT).show()
-                                    }
-
-                                    Timber.e(t)
-
-
-                                })
+                        }, {
+                            Snackbar.make(root_view, it.message
+                                    ?: getString(R.string.unknown_error), Snackbar.LENGTH_SHORT).show()
+                        })
                 )
 
             }
@@ -95,23 +86,10 @@ class MainActivity : BaseActivity() {
 
                 pb_loading.visibility = View.VISIBLE
 
-                cDispose.add(viewModel.obterDefinicao(et_entrada.text.toString()).subscribe({ x ->
-                    pb_loading.visibility = View.GONE
-                    rlDefinicoes.adapter = AdapterDefinicoes(x.superEntry)
-                    pb_loading.visibility = View.GONE
-                    et_entrada.clearFocus()
-                    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                    imm.hideSoftInputFromWindow(et_entrada.windowToken, 0)
-
-                }, { t ->
-                    pb_loading.visibility = View.GONE
-
-                    when (t) {
-                        is HttpException -> Toast.makeText(this, "Entrada não encontrada", Toast.LENGTH_SHORT).show()
-                        is SocketTimeoutException -> Toast.makeText(this, "Servidor ocupado, tente novamente em instantes", Toast.LENGTH_LONG).show()
-                        else -> Toast.makeText(this, t.message, Toast.LENGTH_SHORT).show()
-                    }
-                    Timber.e(t)
+                cDispose.add(viewModel.obterDefinicao(et_entrada.text.toString()).subscribe({
+                    sucess(it)
+                }, {
+                    error1(it)
                 }))
 
             } else {
@@ -128,16 +106,45 @@ class MainActivity : BaseActivity() {
 
     }
 
-    private fun room() {
+    private fun error1(it: Throwable) {
+        pb_loading.visibility = View.GONE
 
-        val db = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "database").allowMainThreadQueries().build()
+        when (it) {
+            is HttpException -> {
 
-        db.testeDao().insertAll(Teste(37, "Anderson"))
-        db.testeDao().insertAll(Teste(1, "Miguel"))
+                val mensagem = when (it.code()) {
+                    404 -> "Palavra não encontraada"
+                    else -> getString(R.string.unknown_error)
+                }
 
-        db.testeDao().getAll().forEach {
-            Timber.d(it.toString())
+                Snackbar.make(root_view, it.message ?: mensagem, Snackbar.LENGTH_SHORT).show()
+            }
+            is SocketTimeoutException -> Snackbar.make(root_view, it.message
+                    ?: "Servidor ocupado, tente novamente em instantes", Snackbar.LENGTH_SHORT).show()
+            else -> Snackbar.make(root_view, it.message ?: it.message
+            ?: getString(R.string.unknown_error), Snackbar.LENGTH_SHORT).show()
         }
-
     }
+
+    private fun sucess(it: Definicoes) {
+        pb_loading.visibility = View.GONE
+        rlDefinicoes.adapter = AdapterDefinicoes(it.superEntry)
+        pb_loading.visibility = View.GONE
+        et_entrada.clearFocus()
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(et_entrada.windowToken, 0)
+    }
+
+//    private fun room() {
+//
+//        val db = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "database").allowMainThreadQueries().build()
+//
+//        db.testeDao().insertAll(Teste(37, "Anderson"))
+//        db.testeDao().insertAll(Teste(1, "Miguel"))
+//
+//        db.testeDao().getAll().forEach {
+//            Timber.d(it.toString())
+//        }
+//
+//    }
 }

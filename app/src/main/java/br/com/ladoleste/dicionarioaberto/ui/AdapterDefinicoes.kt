@@ -40,7 +40,7 @@ class AdapterDefinicoes(private val definicoes: List<SuperEntry>) : RecyclerView
             0 -> "¹"
             1 -> "²"
             2 -> "³"
-            else -> " ($position)"
+            else -> String.format(" (%s)", position + 1)
         }
     }
 

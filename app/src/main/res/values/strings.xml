@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Dicionario Aberto</string>
+    <string name="unknown_error">Entrada não encontrada</string>
 </resources>

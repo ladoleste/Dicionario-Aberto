@@ -26,9 +26,9 @@ class MainActivity : BaseActivity() {
     private lateinit var viewModel: MainViewModel
 
     private val rlDefinicoes by lazy {
-        rl_definicoes.setHasFixedSize(true)
-        rl_definicoes.layoutManager = LinearLayoutManager(this)
-        rl_definicoes
+        rv_definicoes.setHasFixedSize(true)
+        rv_definicoes.layoutManager = LinearLayoutManager(this)
+        rv_definicoes
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,12 +56,20 @@ class MainActivity : BaseActivity() {
 
                 cDispose.add(viewModel.completarPalavra(s.toString())
                         .subscribe({
-                            adapter.clear()
-                            adapter.addAll(it.list)
-                            adapter.filter.filter(et_entrada.text, et_entrada)
+                            //fixme verificar porque a mensagem de nenhuma sugestão não funciona
+                            if (it.list.isEmpty())
+                                mostrarSugestoes(adapter, listOf("[Nenhuma sugestão]"))
+                            else
+                                mostrarSugestoes(adapter, it.list)
                         }, {
-                            Snackbar.make(root_view, it.message
-                                    ?: getString(R.string.unknown_error), Snackbar.LENGTH_SHORT).show()
+
+                            //                            when (it) {
+//                                is HttpException -> if (it.code() == 404) mostrarSugestoes(adapter, listOf("[Nenhuma sugestão]")) else mostrarSugestoes(adapter, listOf("[Indisponível]"))
+//                                else -> mostrarSugestoes(adapter, listOf("[Indisponível]"))
+//                            }
+
+                            mostrarSugestoes(adapter, listOf("[Indisponível]"))
+
                         })
                 )
 
@@ -105,6 +113,12 @@ class MainActivity : BaseActivity() {
 
         //room()
 
+    }
+
+    private fun mostrarSugestoes(adapter: ArrayAdapter<String>, list: List<String>) {
+        adapter.clear()
+        adapter.addAll(list)
+        adapter.filter.filter(et_entrada.text, et_entrada)
     }
 
     private fun error1(it: Throwable) {

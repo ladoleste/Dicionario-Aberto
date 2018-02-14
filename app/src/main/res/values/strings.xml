@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Dicionario Aberto</string>
     <string name="unknown_error">Entrada não encontrada</string>
+    <string name="word_to_define">Informe a palavra</string>
+    <string name="define">definir</string>
+    <string name="clear">Limpar</string>
 </resources>

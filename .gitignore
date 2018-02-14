@@ -3,5 +3,4 @@
 /local.properties
 .idea
 build
-/captures
-.externalNativeBuild
+release.keystore

@@ -3,10 +3,10 @@ package br.com.ladoleste.dicionarioaberto.app
 /**
  *Created by Anderson on 13/12/2017.
  */
+import br.com.ladoleste.dicionarioaberto.BuildConfig
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import timber.log.BuildConfig
 import timber.log.Timber
 
 object OkHttpProvider {
@@ -18,7 +18,6 @@ object OkHttpProvider {
 
                 val logging = HttpLoggingInterceptor(HttpLoggingInterceptor.Logger { mensagem -> Timber.tag("OkHttp").d(mensagem); })
 
-                //todo Verificar por que esta merda não funciona
                 @Suppress("ConstantConditionIf")
                 logging.level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BASIC else HttpLoggingInterceptor.Level.NONE
 

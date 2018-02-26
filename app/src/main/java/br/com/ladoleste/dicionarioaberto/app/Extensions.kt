@@ -19,4 +19,3 @@ fun String.toHtml(): Spanned {
         Html.fromHtml(this)
     }
 }
-
